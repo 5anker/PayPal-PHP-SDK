@@ -57,28 +57,31 @@ class PayPalLogger extends AbstractLogger
         $this->initialize();
     }
 
-    public function initialize()
+    public function initialize(): void
     {
         $config = PayPalConfigManager::getInstance()->getConfigHashmap();
         if (!empty($config)) {
             $this->isLoggingEnabled = (array_key_exists('log.LogEnabled', $config) && $config['log.LogEnabled'] == '1');
             if ($this->isLoggingEnabled) {
-                $this->loggerFile = ($config['log.FileName']) ? $config['log.FileName'] : ini_get('error_log');
+                $this->loggerFile = ($config['log.FileName'])
+                    ?: ini_get('error_log');
                 $loggingLevel = strtoupper($config['log.LogLevel']);
-                $this->loggingLevel = (isset($loggingLevel) && defined("\\Psr\\Log\\LogLevel::$loggingLevel")) ?
+                $this->loggingLevel = (defined("\\Psr\\Log\\LogLevel::$loggingLevel")) ?
                     constant("\\Psr\\Log\\LogLevel::$loggingLevel") :
                     LogLevel::INFO;
             }
         }
     }
 
-    public function log($level, $message, array $context = array())
+    public function log($level, $message, array $context = array()): void
     {
-        if ($this->isLoggingEnabled) {
-            // Checks if the message is at level below configured logging level
-            if (array_search($level, $this->loggingLevels) <= array_search($this->loggingLevel, $this->loggingLevels)) {
-                error_log("[" . date('d-m-Y H:i:s') . "] " . $this->loggerName . " : " . strtoupper($level) . ": $message\n", 3, $this->loggerFile);
-            }
+        // Checks if the message is at level below configured logging level
+        if ($this->isLoggingEnabled
+            && array_search($level, $this->loggingLevels, true)
+            <= array_search($this->loggingLevel,
+                $this->loggingLevels, true)
+        ) {
+            error_log("[" . date('d-m-Y H:i:s') . "] " . $this->loggerName . " : " . strtoupper($level) . ": $message\n", 3, $this->loggerFile);
         }
     }
 }

@@ -15,35 +15,36 @@ class PayPalLoggingManager
     /**
      * @var array of logging manager instances with class name as key
      */
-    private static $instances = array();
+    private static array $instances = array();
 
     /**
      * The logger to be used for all messages
      *
      * @var LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * Logger Name
      *
      * @var string
      */
-    private $loggerName;
+    private string $loggerName;
 
     /**
      * Returns the singleton object
      *
-     * @param string $loggerName
+     * @param string  $loggerName
+     *
      * @return $this
      */
-    public static function getInstance($loggerName = __CLASS__)
+    public static function getInstance(string $loggerName = __CLASS__): PayPalLoggingManager
     {
-        if (array_key_exists($loggerName, PayPalLoggingManager::$instances)) {
-            return PayPalLoggingManager::$instances[$loggerName];
+        if (array_key_exists($loggerName, self::$instances)) {
+            return self::$instances[$loggerName];
         }
         $instance = new self($loggerName);
-        PayPalLoggingManager::$instances[$loggerName] = $instance;
+        self::$instances[$loggerName] = $instance;
         return $instance;
     }
 
@@ -66,9 +67,9 @@ class PayPalLoggingManager
     /**
      * Log Error
      *
-     * @param string $message
+     * @param  string  $message
      */
-    public function error($message)
+    public function error(string $message): void
     {
         $this->logger->error($message);
     }
@@ -76,9 +77,9 @@ class PayPalLoggingManager
     /**
      * Log Warning
      *
-     * @param string $message
+     * @param  string  $message
      */
-    public function warning($message)
+    public function warning(string $message): void
     {
         $this->logger->warning($message);
     }
@@ -86,9 +87,9 @@ class PayPalLoggingManager
     /**
      * Log Info
      *
-     * @param string $message
+     * @param  string  $message
      */
-    public function info($message)
+    public function info(string $message): void
     {
         $this->logger->info($message);
     }
@@ -96,9 +97,9 @@ class PayPalLoggingManager
     /**
      * Log Fine
      *
-     * @param string $message
+     * @param  string  $message
      */
-    public function fine($message)
+    public function fine(string $message): void
     {
         $this->info($message);
     }
@@ -106,13 +107,13 @@ class PayPalLoggingManager
     /**
      * Log Debug
      *
-     * @param string $message
+     * @param  string  $message
      */
-    public function debug($message)
+    public function debug(string $message): void
     {
         $config = PayPalConfigManager::getInstance()->getConfigHashmap();
         // Disable debug in live mode.
-        if (array_key_exists('mode', $config) && $config['mode'] != 'live') {
+        if (array_key_exists('mode', $config) && $config['mode'] !== 'live') {
             $this->logger->debug($message);
         }
     }
